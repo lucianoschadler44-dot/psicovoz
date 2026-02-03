@@ -1,5 +1,5 @@
 """
-PSICOVOZ - Main Application
+PSICOAPOIO - Main Application
 Assistente Terapeutico por Voz em Tempo Real
 """
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
@@ -29,7 +29,7 @@ logger.add(
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("=" * 50)
-    logger.info("🧠 PSICOVOZ - Iniciando...")
+    logger.info("🧠 PSICOAPOIO - Iniciando...")
     logger.info("=" * 50)
     
     try:
@@ -43,11 +43,11 @@ async def lifespan(app: FastAPI):
         raise
     
     yield
-    logger.info("🛑 PsicoVoz encerrado")
+    logger.info("🛑 PsicoApoio encerrado")
 
 
 app = FastAPI(
-    title="PsicoVoz API",
+    title="PsicoApoio API",
     description="Assistente Terapeutico por Voz em Tempo Real",
     version="0.1.0",
     lifespan=lifespan
@@ -82,7 +82,7 @@ async def serve_frontend():
 @app.get("/")
 async def root():
     return {
-        "app": "PsicoVoz",
+        "app": "PsicoApoio",
         "version": "0.1.0",
         "status": "online",
         "frontend": "/app",

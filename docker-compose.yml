@@ -3,7 +3,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: psicovoz-backend
+    container_name: psicoapoio-backend
     ports:
       - "8000:8000"
     environment:
@@ -21,7 +21,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: psicovoz-redis
+    container_name: psicoapoio-redis
     ports:
       - "6379:6379"
     restart: unless-stopped

@@ -1,35 +1,39 @@
-# PsicoVoz
+# 🧠 PsicoApoio
 
-**Assistente Terapeutico por Voz em Tempo Real**
+**Assistente Terapêutico - Apoio Psicológico Online**
 
-> AVISO: Este app e um COMPLEMENTO ao tratamento profissional, NAO um substituto.
+> ⚠️ **AVISO**: Este app é um COMPLEMENTO ao tratamento profissional, NÃO um substituto.
 
-## Abordagens Disponiveis
+## 🎯 Sobre
 
-- Psicanalise - Foco no inconsciente e interpretacao
-- Behaviorismo (TCC) - Foco em comportamentos e metas
-- Gestalt - Foco no aqui-agora e awareness
+PsicoApoio é um assistente de apoio psicológico que oferece conversas terapêuticas baseadas em três abordagens:
 
-## Stack
+| Abordagem | Terapeuta | Fundamentação |
+|-----------|-----------|---------------|
+| 🛋️ Psicanálise | Dr. Sigmund | Freud, Lacan, Winnicott |
+| 📊 TCC | Dr. Aaron | Beck, Ellis, Terapia Cognitivo-Comportamental |
+| 🔮 Gestalt | Dr. Fritz | Perls, Zinker, Aqui-agora |
 
-- Backend: Python + FastAPI + WebSocket
-- STT: OpenAI Whisper (local GPU)
-- TTS: Coqui TTS (local GPU)
-- LLM: Claude API (Anthropic)
-- Mobile: React Native
+## 🚀 Como Usar
 
-## Quick Start
-```bash
-cp .env.example .env
-# Edite .env com sua ANTHROPIC_API_KEY
-docker-compose up -d
-```
+Acesse: **[link será gerado após deploy]**
 
-## Em Caso de Crise
+1. Escolha uma abordagem terapêutica
+2. Converse com o assistente
+3. Receba apoio baseado em técnicas reais de psicologia
 
-- CVV: 188 (24h)
-- SAMU: 192
+## 🛡️ Segurança
 
-## Autor
+- Detecção de crise com redirecionamento ao CVV (188)
+- Sem diagnósticos ou prescrições
+- Complemento, não substituto de terapia
+
+## 📞 Em Caso de Crise
+
+- **CVV**: 188 (24h, gratuito)
+- **SAMU**: 192
+- **cvv.org.br**
+
+## 👨‍💻 Desenvolvido por
 
 L.A. Schadler Engenharia

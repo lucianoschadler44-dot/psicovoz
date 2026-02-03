@@ -3,399 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PsicoVoz - Assistente Terapeutico</title>
+    <title>PsicoApoio - Assistente Terapeutico</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             min-height: 100vh;
             color: #fff;
         }
-        
         .container { max-width: 800px; margin: 0 auto; padding: 20px; }
-        
-        header {
-            text-align: center;
-            padding: 20px 0;
-            border-bottom: 1px solid #ffffff20;
-            margin-bottom: 20px;
-        }
-        
+        header { text-align: center; padding: 20px 0; border-bottom: 1px solid #ffffff20; margin-bottom: 20px; }
         header h1 { font-size: 2em; margin-bottom: 5px; }
         header p { color: #888; font-size: 0.9em; }
-        
         #selection-screen { display: block; }
         #chat-screen { display: none; }
-        
-        .approaches {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 30px;
-        }
-        
+        .approaches { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 30px; }
         .approach-card {
-            background: #ffffff10;
-            border: 2px solid #ffffff20;
-            border-radius: 15px;
-            padding: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
+            background: #ffffff10; border: 2px solid #ffffff20; border-radius: 15px;
+            padding: 25px; cursor: pointer; transition: all 0.3s ease; text-align: center;
         }
-        
-        .approach-card:hover {
-            background: #ffffff20;
-            border-color: #4a90a4;
-            transform: translateY(-5px);
-        }
-        
+        .approach-card:hover { background: #ffffff20; border-color: #4a90a4; transform: translateY(-5px); }
         .approach-card .icon { font-size: 3em; margin-bottom: 15px; }
         .approach-card h3 { margin-bottom: 10px; color: #4a90a4; }
         .approach-card p { font-size: 0.85em; color: #aaa; }
-        
-        .chat-header {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            padding: 20px;
-            background: #ffffff10;
-            border-radius: 15px;
-            margin-bottom: 20px;
-        }
-        
+        .chat-header { display: flex; align-items: center; gap: 20px; padding: 20px; background: #ffffff10; border-radius: 15px; margin-bottom: 20px; }
         .avatar-container {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 3px solid #4a90a4;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 4em;
-            background: #1a1a2e;
-            transition: all 0.3s ease;
+            width: 100px; height: 100px; border-radius: 50%; border: 3px solid #4a90a4;
+            display: flex; align-items: center; justify-content: center; font-size: 3em; background: #1a1a2e;
         }
-        
-        .avatar-container.speaking {
-            animation: pulse 0.5s infinite;
-            border-color: #00ff88;
-            box-shadow: 0 0 30px #00ff8840;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        
         .therapist-info h2 { color: #4a90a4; margin-bottom: 5px; }
         .therapist-info p { color: #888; font-size: 0.9em; }
-        
-        .chat-messages {
-            height: 300px;
-            overflow-y: auto;
-            padding: 20px;
-            background: #ffffff05;
-            border-radius: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .message {
-            margin-bottom: 15px;
-            padding: 12px 18px;
-            border-radius: 15px;
-            max-width: 80%;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .message.therapist {
-            background: linear-gradient(135deg, #2d4a5e, #1a3a4a);
-            margin-right: auto;
-            border-bottom-left-radius: 5px;
-        }
-        
-        .message.user {
-            background: linear-gradient(135deg, #4a3728, #3a2718);
-            margin-left: auto;
-            border-bottom-right-radius: 5px;
-        }
-        
-        .input-area {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        
+        .therapist-info .quote { font-style: italic; color: #aaa; font-size: 0.8em; margin-top: 5px; }
+        .chat-messages { height: 350px; overflow-y: auto; padding: 20px; background: #ffffff05; border-radius: 15px; margin-bottom: 20px; }
+        .message { margin-bottom: 15px; padding: 12px 18px; border-radius: 15px; max-width: 85%; animation: fadeIn 0.3s ease; line-height: 1.5; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .message.therapist { background: linear-gradient(135deg, #2d4a5e, #1a3a4a); margin-right: auto; border-bottom-left-radius: 5px; }
+        .message.user { background: linear-gradient(135deg, #4a3728, #3a2718); margin-left: auto; border-bottom-right-radius: 5px; }
+        .input-area { display: flex; gap: 10px; }
         .input-area input {
-            flex: 1;
-            padding: 15px 20px;
-            border: none;
-            border-radius: 25px;
-            background: #ffffff15;
-            color: #fff;
-            font-size: 1em;
+            flex: 1; padding: 15px 20px; border: none; border-radius: 25px;
+            background: #ffffff15; color: #fff; font-size: 1em;
         }
-        
         .input-area input::placeholder { color: #666; }
         .input-area input:focus { outline: 2px solid #4a90a4; }
-        
-        .btn {
-            padding: 15px 25px;
-            border: none;
-            border-radius: 25px;
-            color: #fff;
-            font-size: 1em;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        .input-area button {
+            padding: 15px 30px; border: none; border-radius: 25px;
+            background: linear-gradient(135deg, #4a90a4, #357a8a); color: #fff;
+            font-size: 1em; cursor: pointer; transition: all 0.3s ease;
         }
-        
-        .btn:hover { transform: scale(1.05); }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        
-        .btn-send {
-            background: linear-gradient(135deg, #4a90a4, #357a8a);
-        }
-        
-        .btn-mic {
-            background: linear-gradient(135deg, #a44a4a, #8a3535);
-            font-size: 1.3em;
-            padding: 15px 20px;
-        }
-        
-        .btn-mic.recording {
-            background: linear-gradient(135deg, #ff4444, #cc0000);
-            animation: recording-pulse 1s infinite;
-        }
-        
-        @keyframes recording-pulse {
-            0%, 100% { box-shadow: 0 0 0 0 #ff444440; }
-            50% { box-shadow: 0 0 0 15px #ff444400; }
-        }
-        
-        .back-btn {
-            background: #ffffff20;
-            border: none;
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            margin-bottom: 20px;
-        }
-        
+        .input-area button:hover { transform: scale(1.05); }
+        .back-btn { background: #ffffff20; border: none; color: #fff; padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-bottom: 20px; }
         .back-btn:hover { background: #ffffff30; }
-        
-        .status {
-            text-align: center;
-            padding: 10px;
-            color: #888;
-            font-size: 0.85em;
-        }
-        
+        .status { text-align: center; padding: 10px; color: #888; font-size: 0.85em; }
         .status.connected { color: #4a9; }
-        .status.recording { color: #f44; }
         .status.error { color: #a44; }
-        
-        .crisis-alert {
-            background: linear-gradient(135deg, #8b0000, #a00);
-            padding: 20px;
-            border-radius: 15px;
-            margin: 15px 0;
-            text-align: center;
-        }
-        
+        .crisis-alert { background: linear-gradient(135deg, #8b0000, #a00); padding: 20px; border-radius: 15px; margin: 15px 0; text-align: center; }
         .crisis-alert a { color: #fff; font-weight: bold; font-size: 1.3em; }
-        
-        .audio-indicator {
-            display: none;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 20px;
-            background: #00ff8820;
-            border-radius: 10px;
-            margin-bottom: 10px;
-        }
-        
-        .audio-indicator.active { display: flex; }
-        .audio-indicator span { color: #00ff88; }
+        .disclaimer { background: #ffffff10; padding: 15px; border-radius: 10px; margin-top: 20px; font-size: 0.8em; color: #888; text-align: center; }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🧠 PsicoVoz</h1>
-            <p>Assistente Terapeutico por Voz</p>
+            <h1>🧠 PsicoApoio</h1>
+            <p>Assistente Terapêutico - Apoio Psicológico</p>
         </header>
-
         <div id="selection-screen">
-            <h2 style="text-align:center; margin-bottom:10px;">Escolha sua abordagem</h2>
-            <p style="text-align:center; color:#888;">Ou deixe o assistente escolher por voce</p>
-            
+            <h2 style="text-align:center; margin-bottom:10px;">Escolha sua abordagem terapêutica</h2>
+            <p style="text-align:center; color:#888;">Cada abordagem oferece uma perspectiva única para seu bem-estar</p>
             <div class="approaches">
-                <div class="approach-card" onclick="selectApproach('auto')">
-                    <div class="icon">🎯</div>
-                    <h3>Automatico</h3>
-                    <p>Deixe o assistente escolher a melhor abordagem para voce</p>
-                </div>
                 <div class="approach-card" onclick="selectApproach('psicanalise')">
                     <div class="icon">🛋️</div>
-                    <h3>Psicanalise</h3>
-                    <p>Foco no inconsciente, sonhos e historia pessoal</p>
+                    <h3>Psicanálise</h3>
+                    <p>Exploração do inconsciente, sonhos e história pessoal com base em Freud e Lacan</p>
                 </div>
                 <div class="approach-card" onclick="selectApproach('behaviorismo')">
                     <div class="icon">📊</div>
-                    <h3>Behaviorismo</h3>
-                    <p>Foco em comportamentos, pensamentos e metas</p>
+                    <h3>TCC</h3>
+                    <p>Terapia Cognitivo-Comportamental focada em pensamentos, emoções e comportamentos</p>
                 </div>
                 <div class="approach-card" onclick="selectApproach('gestalt')">
                     <div class="icon">🔮</div>
                     <h3>Gestalt</h3>
-                    <p>Foco no aqui-agora e sensacoes presentes</p>
+                    <p>Foco no aqui-agora, consciência corporal e experiência presente</p>
                 </div>
             </div>
+            <div class="disclaimer">
+                ⚠️ Este assistente é um complemento ao tratamento profissional, não um substituto.
+                Em caso de crise, ligue CVV: 188
+            </div>
         </div>
-
         <div id="chat-screen">
             <button class="back-btn" onclick="goBack()">← Voltar</button>
-            
             <div class="chat-header">
                 <div class="avatar-container" id="avatar">👤</div>
                 <div class="therapist-info">
                     <h2 id="therapist-name">Terapeuta</h2>
                     <p id="therapist-desc">Conectando...</p>
+                    <p class="quote" id="therapist-quote"></p>
                 </div>
             </div>
-            
-            <div class="audio-indicator" id="audio-indicator">
-                <span>🔊 Reproduzindo audio...</span>
-            </div>
-            
             <div class="chat-messages" id="messages"></div>
-            
             <div class="status" id="status">Conectando...</div>
-            
             <div class="input-area">
-                <button class="btn btn-mic" id="mic-btn" onclick="toggleRecording()">🎤</button>
-                <input type="text" id="user-input" placeholder="Digite ou use o microfone..." 
-                       onkeypress="if(event.key==='Enter')sendMessage()">
-                <button class="btn btn-send" onclick="sendMessage()">Enviar</button>
+                <input type="text" id="user-input" placeholder="Digite sua mensagem..." onkeypress="if(event.key==='Enter')sendMessage()">
+                <button onclick="sendMessage()">Enviar</button>
             </div>
         </div>
     </div>
-
     <script>
         let ws = null;
         let currentApproach = null;
-        let mediaRecorder = null;
-        let audioChunks = [];
-        let isRecording = false;
-        
         const avatars = {
-            shadow: { icon: '👤', name: 'Terapeuta', color: '#1a1a2e' },
-            psicanalise: { icon: '🛋️', name: 'Dr. Sigmund', color: '#4a3728' },
-            behaviorismo: { icon: '📊', name: 'Dr. Burrhus', color: '#2d4a5e' },
-            gestalt: { icon: '🔮', name: 'Dr. Friedrich', color: '#3d5a3d' }
+            psicanalise: { icon: '🛋️', name: 'Dr. Sigmund', desc: 'Abordagem Psicanalítica', quote: '"O sonho é a estrada real para o inconsciente"', color: '#4a3728' },
+            behaviorismo: { icon: '📊', name: 'Dr. Aaron', desc: 'Terapia Cognitivo-Comportamental', quote: '"Nossos pensamentos moldam nossa realidade"', color: '#2d4a5e' },
+            gestalt: { icon: '🔮', name: 'Dr. Fritz', desc: 'Abordagem Gestalt', quote: '"Perca a cabeça e caia em si"', color: '#3d5a3d' }
         };
-        
         function selectApproach(approach) {
             currentApproach = approach;
             document.getElementById('selection-screen').style.display = 'none';
             document.getElementById('chat-screen').style.display = 'block';
+            updateAvatar(approach);
             connectWebSocket(approach);
         }
-        
         function goBack() {
             if (ws) ws.close();
-            if (isRecording) stopRecording();
             document.getElementById('selection-screen').style.display = 'block';
             document.getElementById('chat-screen').style.display = 'none';
             document.getElementById('messages').innerHTML = '';
-            updateStatus('Desconectado', '');
         }
-        
         function connectWebSocket(approach) {
             updateStatus('Conectando...', '');
             ws = new WebSocket(`ws://localhost:8000/ws/voice/${approach}`);
-            
             ws.onopen = () => updateStatus('Conectado', 'connected');
-            
-            ws.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                handleResponse(data);
-            };
-            
-            ws.onerror = () => updateStatus('Erro na conexao', 'error');
+            ws.onmessage = (event) => handleResponse(JSON.parse(event.data));
+            ws.onerror = () => updateStatus('Erro na conexão', 'error');
             ws.onclose = () => updateStatus('Desconectado', 'error');
         }
-        
         function handleResponse(data) {
             if (data.type === 'response') {
                 addMessage(data.text, 'therapist');
-                updateAvatar(data.avatar || currentApproach);
-                
-                // Tocar audio se disponivel
-                if (data.audio) {
-                    playAudio(data.audio);
-                }
-                
-                if (data.crisis_info) {
-                    showCrisisAlert(data.crisis_info);
-                }
-            } else if (data.type === 'transcription') {
-                addMessage(data.text, 'user');
+                if (data.crisis_info) showCrisisAlert();
             }
         }
-        
-        function playAudio(base64Audio) {
-            try {
-                const avatar = document.getElementById('avatar');
-                const indicator = document.getElementById('audio-indicator');
-                
-                // Decodificar base64 para blob
-                const byteCharacters = atob(base64Audio);
-                const byteNumbers = new Array(byteCharacters.length);
-                for (let i = 0; i < byteCharacters.length; i++) {
-                    byteNumbers[i] = byteCharacters.charCodeAt(i);
-                }
-                const byteArray = new Uint8Array(byteNumbers);
-                const blob = new Blob([byteArray], { type: 'audio/mp3' });
-                
-                const audioUrl = URL.createObjectURL(blob);
-                const audio = new Audio(audioUrl);
-                
-                // Indicadores visuais
-                avatar.classList.add('speaking');
-                indicator.classList.add('active');
-                
-                audio.onended = () => {
-                    avatar.classList.remove('speaking');
-                    indicator.classList.remove('active');
-                    URL.revokeObjectURL(audioUrl);
-                };
-                
-                audio.play();
-            } catch (e) {
-                console.error('Erro ao tocar audio:', e);
-            }
-        }
-        
         function updateAvatar(approach) {
-            const av = avatars[approach] || avatars.shadow;
+            const av = avatars[approach];
             document.getElementById('avatar').textContent = av.icon;
             document.getElementById('therapist-name').textContent = av.name;
-            document.getElementById('therapist-desc').textContent = 
-                approach === 'psicanalise' ? 'Abordagem Psicanalitica' :
-                approach === 'behaviorismo' ? 'Abordagem Comportamental' :
-                approach === 'gestalt' ? 'Abordagem Gestalt' : 'Escolhendo...';
+            document.getElementById('therapist-desc').textContent = av.desc;
+            document.getElementById('therapist-quote').textContent = av.quote;
         }
-        
         function addMessage(text, type) {
             const messagesDiv = document.getElementById('messages');
             const msgDiv = document.createElement('div');
@@ -404,89 +162,20 @@
             messagesDiv.appendChild(msgDiv);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
-        
         function sendMessage() {
             const input = document.getElementById('user-input');
             const text = input.value.trim();
-            
             if (!text || !ws || ws.readyState !== WebSocket.OPEN) return;
-            
             addMessage(text, 'user');
             ws.send(JSON.stringify({ command: 'text_message', text: text }));
             input.value = '';
         }
-        
-        // Funcoes de gravacao de voz
-        async function toggleRecording() {
-            if (isRecording) {
-                stopRecording();
-            } else {
-                await startRecording();
-            }
-        }
-        
-        async function startRecording() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream);
-                audioChunks = [];
-                
-                mediaRecorder.ondataavailable = (event) => {
-                    audioChunks.push(event.data);
-                };
-                
-                mediaRecorder.onstop = async () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                    await sendAudio(audioBlob);
-                    stream.getTracks().forEach(track => track.stop());
-                };
-                
-                mediaRecorder.start();
-                isRecording = true;
-                
-                document.getElementById('mic-btn').classList.add('recording');
-                updateStatus('🔴 Gravando... Clique para parar', 'recording');
-                
-            } catch (e) {
-                console.error('Erro ao acessar microfone:', e);
-                updateStatus('Erro: Permita acesso ao microfone', 'error');
-            }
-        }
-        
-        function stopRecording() {
-            if (mediaRecorder && isRecording) {
-                mediaRecorder.stop();
-                isRecording = false;
-                document.getElementById('mic-btn').classList.remove('recording');
-                updateStatus('Processando audio...', 'connected');
-            }
-        }
-        
-        async function sendAudio(audioBlob) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                const base64Audio = reader.result.split(',')[1];
-                ws.send(JSON.stringify({
-                    command: 'audio_message',
-                    audio: base64Audio
-                }));
-            };
-            reader.readAsDataURL(audioBlob);
-        }
-        
-        function showCrisisAlert(info) {
+        function showCrisisAlert() {
             const alertDiv = document.createElement('div');
             alertDiv.className = 'crisis-alert';
-            alertDiv.innerHTML = `
-                <p>Se voce esta em crise, ligue agora:</p>
-                <a href="tel:188">📞 CVV: 188</a>
-                <p style="margin-top:10px;font-size:0.9em;">
-                    Ou acesse: <a href="https://cvv.org.br" target="_blank">cvv.org.br</a>
-                </p>
-            `;
+            alertDiv.innerHTML = '<p>Se você está em crise, ligue agora:</p><a href="tel:188">📞 CVV: 188</a>';
             document.getElementById('messages').appendChild(alertDiv);
         }
-        
         function updateStatus(text, className) {
             const status = document.getElementById('status');
             status.textContent = text;
