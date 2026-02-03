@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: psicoapoio
+    env: docker
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false
