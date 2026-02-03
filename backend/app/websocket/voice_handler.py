@@ -21,10 +21,10 @@ class SessionState(Enum):
 class VoiceHandler:
     """Gerencia sessao de voz em tempo real."""
     
-    WELCOME_MESSAGE = """Ola! Eu sou seu assistente de apoio psicologico.
-Antes de comecarmos, voce tem preferencia por alguma linha da psicologia?
-Pode ser psicanalise, behaviorismo ou gestalt.
-Ou se preferir, posso escolher a mais adequada para voce."""
+    WELCOME_MESSAGE = """Olá! Eu sou seu assistente de apoio psicológico.
+Antes de começarmos, você tem preferência por alguma linha da psicologia?
+Pode ser psicanálise, behaviorismo ou gestalt.
+Ou se preferir, posso escolher a mais adequada para você."""
     
     def __init__(self, websocket, approach, stt_service, tts_service, llm_service, avatar_service=None):
         self.ws = websocket
@@ -63,7 +63,7 @@ Ou se preferir, posso escolher a mais adequada para voce."""
     
     async def _send_initial_welcome(self):
         self.state = SessionState.CHOOSING
-        audio = await self.tts.synthesize(self.WELCOME_MESSAGE)
+        audio = await self.tts.synthesize(self.WELCOME_MESSAGE, "shadow")
         await self._send_response(
             text=self.WELCOME_MESSAGE,
             audio=audio,
@@ -73,9 +73,9 @@ Ou se preferir, posso escolher a mais adequada para voce."""
     
     async def _send_welcome_with_approach(self):
         metadata = self._get_avatar_metadata()
-        welcome = f"Ola! Eu sou {metadata['name']}, seu assistente com abordagem {metadata['description']}. Estou aqui para te ouvir e apoiar. Como voce esta se sentindo hoje?"
+        welcome = f"Olá! Eu sou {metadata['name']}, seu assistente com abordagem {metadata['description']}. Estou aqui para te ouvir e apoiar. Como você está se sentindo hoje?"
         
-        audio = await self.tts.synthesize(welcome)
+        audio = await self.tts.synthesize(welcome, self.approach)
         
         await self._send_response(
             text=welcome,
@@ -110,11 +110,9 @@ Ou se preferir, posso escolher a mais adequada para voce."""
     async def _handle_audio_message(self, audio_base64: str):
         """Processa mensagem de audio do usuario."""
         try:
-            # Decodificar base64 para bytes
             audio_bytes = base64.b64decode(audio_base64)
             logger.info(f"🎤 Audio recebido: {len(audio_bytes)} bytes")
             
-            # Transcrever audio para texto
             result = await self.stt.transcribe(audio_bytes)
             text = result.get("text", "")
             
@@ -122,10 +120,8 @@ Ou se preferir, posso escolher a mais adequada para voce."""
                 logger.warning("⚠️ Transcricao vazia")
                 return
             
-            # Enviar transcricao para o cliente
             await self.ws.send_json({"type": "transcription", "text": text})
             
-            # Processar como mensagem normal
             if self.state == SessionState.CHOOSING:
                 await self._handle_approach_choice(text)
             else:
@@ -142,8 +138,8 @@ Ou se preferir, posso escolher a mais adequada para voce."""
         elif choice:
             self.approach = choice
         else:
-            msg = "Desculpe, nao entendi. Voce prefere psicanalise, behaviorismo ou gestalt?"
-            audio = await self.tts.synthesize(msg)
+            msg = "Desculpe, não entendi. Você prefere psicanálise, behaviorismo ou gestalt?"
+            audio = await self.tts.synthesize(msg, "shadow")
             await self._send_response(text=msg, audio=audio, avatar="shadow", state="choosing")
             return
         
@@ -151,7 +147,6 @@ Ou se preferir, posso escolher a mais adequada para voce."""
         await self._send_welcome_with_approach()
     
     async def _handle_conversation(self, text: str):
-        # Verificar crise
         crisis = await self.llm.detect_crisis(text)
         if crisis["is_crisis"]:
             self.state = SessionState.CRISIS
@@ -168,7 +163,7 @@ Ou se preferir, posso escolher a mais adequada para voce."""
         
         self.conversation_history.append({"role": "assistant", "content": response})
         
-        audio = await self.tts.synthesize(response)
+        audio = await self.tts.synthesize(response, self.approach)
         
         await self._send_response(
             text=response,
@@ -180,7 +175,7 @@ Ou se preferir, posso escolher a mais adequada para voce."""
     async def _handle_crisis(self, crisis: dict):
         logger.warning("🚨 Modo CRISE ativado")
         response = crisis["response"]
-        audio = await self.tts.synthesize(response)
+        audio = await self.tts.synthesize(response, self.approach)
         
         await self._send_response(
             text=response,
@@ -196,12 +191,12 @@ Ou se preferir, posso escolher a mais adequada para voce."""
             self.approach = new_approach
             metadata = self._get_avatar_metadata()
             msg = f"Certo! Agora estou usando a abordagem {metadata['description']}."
-            audio = await self.tts.synthesize(msg)
+            audio = await self.tts.synthesize(msg, new_approach)
             await self._send_response(text=msg, audio=audio, avatar=new_approach, state="active")
     
     async def _end_session(self):
-        msg = "Foi bom conversar com voce. Lembre-se: buscar ajuda e um ato de coragem. Cuide-se!"
-        audio = await self.tts.synthesize(msg)
+        msg = "Foi bom conversar com você. Lembre-se: buscar ajuda é um ato de coragem. Cuide-se!"
+        audio = await self.tts.synthesize(msg, self.approach)
         await self._send_response(text=msg, audio=audio, avatar=self.approach, state="ended")
         self.state = SessionState.ENDED
     
@@ -223,7 +218,7 @@ Ou se preferir, posso escolher a mais adequada para voce."""
             approach = self.approach
         metadata = {
             "shadow": {"name": "Terapeuta", "description": "Escolha sua abordagem", "color": "#1a1a2e"},
-            "psicanalise": {"name": "Dr. Sigmund", "description": "Psicanalitica", "color": "#4a3728"},
+            "psicanalise": {"name": "Dr. Sigmund", "description": "Psicanalítica", "color": "#4a3728"},
             "behaviorismo": {"name": "Dr. Burrhus", "description": "Comportamental", "color": "#2d4a5e"},
             "gestalt": {"name": "Dr. Friedrich", "description": "Gestalt", "color": "#3d5a3d"}
         }

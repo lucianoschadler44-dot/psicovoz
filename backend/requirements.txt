@@ -7,13 +7,13 @@ python-multipart==0.0.9
 # Anthropic Claude API
 anthropic==0.18.1
 
-# Speech-to-Text (Whisper - versao leve)
+# Speech-to-Text (Whisper)
 openai-whisper==20231117
 torch==2.1.0
 torchaudio==2.1.0
 
-# Text-to-Speech (gTTS - leve e funcional)
-gTTS==2.5.0
+# Text-to-Speech (Edge TTS - Microsoft)
+edge-tts==6.1.9
 
 # Audio processing (processamento de audio)
 soundfile==0.12.1
