@@ -5,6 +5,7 @@ Assistente Terapeutico por Voz em Tempo Real
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from contextlib import asynccontextmanager
 from loguru import logger
 from pathlib import Path
@@ -17,7 +18,6 @@ from services.llm_service import LLMService
 from services.avatar_service import AvatarService
 from websocket.voice_handler import VoiceHandler
 
-# Configurar logging
 logger.remove()
 logger.add(
     sys.stdout,
@@ -28,12 +28,10 @@ logger.add(
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Inicializacao e shutdown."""
     logger.info("=" * 50)
     logger.info("🧠 PSICOVOZ - Iniciando...")
     logger.info("=" * 50)
     
-    # Inicializar servicos
     try:
         app.state.stt = STTService()
         app.state.tts = TTSService()
@@ -45,7 +43,6 @@ async def lifespan(app: FastAPI):
         raise
     
     yield
-    
     logger.info("🛑 PsicoVoz encerrado")
 
 
@@ -56,7 +53,6 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -65,10 +61,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Servir avatares estaticos
-avatars_path = Path("/app/avatars")
-if avatars_path.exists():
-    app.mount("/avatars", StaticFiles(directory=str(avatars_path)), name="avatars")
+
+# ============================================
+# FRONTEND - Servir HTML
+# ============================================
+
+@app.get("/app")
+async def serve_frontend():
+    """Serve a interface web."""
+    frontend_path = Path("/app/frontend/web/index.html")
+    if frontend_path.exists():
+        return FileResponse(frontend_path)
+    return {"error": "Frontend nao encontrado"}
 
 
 # ============================================
@@ -81,6 +85,7 @@ async def root():
         "app": "PsicoVoz",
         "version": "0.1.0",
         "status": "online",
+        "frontend": "/app",
         "endpoints": {
             "health": "/health",
             "approaches": "/api/approaches",
@@ -143,32 +148,11 @@ async def list_approaches():
 
 @app.get("/api/avatar/{approach}")
 async def get_avatar_info(approach: str):
-    """Retorna informacoes do avatar."""
     avatars = {
-        "shadow": {
-            "name": "Terapeuta",
-            "image": "/avatars/shadow_avatar.png",
-            "color": "#1a1a2e",
-            "description": "Escolha sua abordagem"
-        },
-        "psicanalise": {
-            "name": "Dr. Sigmund",
-            "image": "/avatars/freud_style.png",
-            "color": "#4a3728",
-            "quote": "O sonho e a estrada real para o inconsciente"
-        },
-        "behaviorismo": {
-            "name": "Dr. Burrhus",
-            "image": "/avatars/skinner_style.png",
-            "color": "#2d4a5e",
-            "quote": "O comportamento e moldado por suas consequencias"
-        },
-        "gestalt": {
-            "name": "Dr. Friedrich",
-            "image": "/avatars/perls_style.png",
-            "color": "#3d5a3d",
-            "quote": "Perca a cabeca e caia em si"
-        }
+        "shadow": {"name": "Terapeuta", "image": "/avatars/shadow_avatar.png", "color": "#1a1a2e"},
+        "psicanalise": {"name": "Dr. Sigmund", "image": "/avatars/freud_style.png", "color": "#4a3728"},
+        "behaviorismo": {"name": "Dr. Burrhus", "image": "/avatars/skinner_style.png", "color": "#2d4a5e"},
+        "gestalt": {"name": "Dr. Friedrich", "image": "/avatars/perls_style.png", "color": "#3d5a3d"}
     }
     return avatars.get(approach, avatars["shadow"])
 
@@ -179,7 +163,6 @@ async def get_avatar_info(approach: str):
 
 @app.websocket("/ws/voice/{approach}")
 async def voice_websocket(websocket: WebSocket, approach: str):
-    """WebSocket para conversa por voz."""
     valid = ["auto", "psicanalise", "behaviorismo", "gestalt"]
     
     if approach not in valid:

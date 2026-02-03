@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   backend:
     build:
@@ -16,15 +14,7 @@ services:
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
     volumes:
       - ./backend/app:/app
-      - whisper_cache:/root/.cache/whisper
-      - tts_cache:/root/.local/share/tts
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
+      - ./frontend:/app/frontend
     depends_on:
       - redis
     restart: unless-stopped
@@ -34,11 +24,4 @@ services:
     container_name: psicovoz-redis
     ports:
       - "6379:6379"
-    volumes:
-      - redis_data:/data
     restart: unless-stopped
-
-volumes:
-  whisper_cache:
-  tts_cache:
-  redis_data:
