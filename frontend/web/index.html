@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PsicoApoio - Assistente Terapeutico</title>
+    <title>PsicoApoio - Assistente Terapêutico</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -12,21 +12,34 @@
             min-height: 100vh;
             color: #fff;
         }
-        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
         header { text-align: center; padding: 20px 0; border-bottom: 1px solid #ffffff20; margin-bottom: 20px; }
         header h1 { font-size: 2em; margin-bottom: 5px; }
         header p { color: #888; font-size: 0.9em; }
-        #selection-screen { display: block; }
-        #chat-screen { display: none; }
-        .approaches { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 30px; }
+        .screen { display: none; }
+        .screen.active { display: block; }
+        .approaches { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 30px; }
+        @media (max-width: 768px) { .approaches, .therapists { grid-template-columns: 1fr; } }
         .approach-card {
             background: #ffffff10; border: 2px solid #ffffff20; border-radius: 15px;
-            padding: 25px; cursor: pointer; transition: all 0.3s ease; text-align: center;
+            padding: 30px 20px; cursor: pointer; transition: all 0.3s ease; text-align: center;
         }
         .approach-card:hover { background: #ffffff20; border-color: #4a90a4; transform: translateY(-5px); }
         .approach-card .icon { font-size: 3em; margin-bottom: 15px; }
-        .approach-card h3 { margin-bottom: 10px; color: #4a90a4; }
-        .approach-card p { font-size: 0.85em; color: #aaa; }
+        .approach-card h3 { margin-bottom: 10px; color: #4a90a4; font-size: 1.2em; }
+        .approach-card p { font-size: 0.85em; color: #aaa; line-height: 1.4; }
+        .therapists { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 30px; }
+        .therapist-card {
+            background: #ffffff10; border: 2px solid #ffffff20; border-radius: 15px;
+            padding: 25px; cursor: pointer; transition: all 0.3s ease; text-align: center;
+        }
+        .therapist-card:hover { background: #ffffff20; transform: translateY(-5px); border-color: var(--hover-color, #4a90a4); }
+        .therapist-card .avatar { font-size: 3em; margin-bottom: 10px; }
+        .therapist-card h3 { color: #4a90a4; margin-bottom: 5px; }
+        .therapist-card .years { font-size: 0.75em; color: #666; margin-bottom: 8px; }
+        .therapist-card .specialty { font-size: 0.85em; color: #aaa; font-style: italic; margin-bottom: 8px; }
+        .therapist-card .style { font-size: 0.75em; color: #888; line-height: 1.4; margin-bottom: 8px; padding: 8px; background: #ffffff08; border-radius: 8px; }
+        .therapist-card .quote { font-size: 0.75em; color: #666; font-style: italic; margin-top: 8px; }
         .chat-header { display: flex; align-items: center; gap: 20px; padding: 20px; background: #ffffff10; border-radius: 15px; margin-bottom: 20px; }
         .avatar-container {
             width: 100px; height: 100px; border-radius: 50%; border: 3px solid #4a90a4;
@@ -35,7 +48,8 @@
         .therapist-info h2 { color: #4a90a4; margin-bottom: 5px; }
         .therapist-info p { color: #888; font-size: 0.9em; }
         .therapist-info .quote { font-style: italic; color: #aaa; font-size: 0.8em; margin-top: 5px; }
-        .chat-messages { height: 350px; overflow-y: auto; padding: 20px; background: #ffffff05; border-radius: 15px; margin-bottom: 20px; }
+        .therapist-info .style-badge { font-size: 0.75em; color: #666; margin-top: 5px; }
+        .chat-messages { height: 320px; overflow-y: auto; padding: 20px; background: #ffffff05; border-radius: 15px; margin-bottom: 20px; }
         .message { margin-bottom: 15px; padding: 12px 18px; border-radius: 15px; max-width: 85%; animation: fadeIn 0.3s ease; line-height: 1.5; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .message.therapist { background: linear-gradient(135deg, #2d4a5e, #1a3a4a); margin-right: auto; border-bottom-left-radius: 5px; }
@@ -61,6 +75,13 @@
         .crisis-alert { background: linear-gradient(135deg, #8b0000, #a00); padding: 20px; border-radius: 15px; margin: 15px 0; text-align: center; }
         .crisis-alert a { color: #fff; font-weight: bold; font-size: 1.3em; }
         .disclaimer { background: #ffffff10; padding: 15px; border-radius: 10px; margin-top: 20px; font-size: 0.8em; color: #888; text-align: center; }
+        .section-title { text-align: center; margin-bottom: 10px; }
+        .section-title h2 { font-size: 1.5em; margin-bottom: 5px; }
+        .section-title p { color: #888; }
+        .line-badge { display: inline-block; padding: 5px 15px; border-radius: 20px; font-size: 0.8em; margin-bottom: 15px; }
+        .line-badge.psicanalise { background: #8B451320; color: #D2691E; }
+        .line-badge.gestalt { background: #228B2220; color: #32CD32; }
+        .line-badge.tcc { background: #4682B420; color: #87CEEB; }
     </style>
 </head>
 <body>
@@ -69,39 +90,56 @@
             <h1>🧠 PsicoApoio</h1>
             <p>Assistente Terapêutico - Apoio Psicológico</p>
         </header>
-        <div id="selection-screen">
-            <h2 style="text-align:center; margin-bottom:10px;">Escolha sua abordagem terapêutica</h2>
-            <p style="text-align:center; color:#888;">Cada abordagem oferece uma perspectiva única para seu bem-estar</p>
+
+        <!-- TELA 1: Escolher Linha -->
+        <div id="screen-lines" class="screen active">
+            <div class="section-title">
+                <h2>Escolha a Linha Terapêutica</h2>
+                <p>Cada abordagem oferece uma perspectiva única</p>
+            </div>
             <div class="approaches">
-                <div class="approach-card" onclick="selectApproach('psicanalise')">
+                <div class="approach-card" onclick="selectLine('psicanalise')">
                     <div class="icon">🛋️</div>
                     <h3>Psicanálise</h3>
-                    <p>Exploração do inconsciente, sonhos e história pessoal com base em Freud e Lacan</p>
+                    <p>Exploração do inconsciente, sonhos, história pessoal e padrões de repetição</p>
                 </div>
-                <div class="approach-card" onclick="selectApproach('behaviorismo')">
-                    <div class="icon">📊</div>
-                    <h3>TCC</h3>
-                    <p>Terapia Cognitivo-Comportamental focada em pensamentos, emoções e comportamentos</p>
-                </div>
-                <div class="approach-card" onclick="selectApproach('gestalt')">
+                <div class="approach-card" onclick="selectLine('gestalt')">
                     <div class="icon">🔮</div>
                     <h3>Gestalt</h3>
-                    <p>Foco no aqui-agora, consciência corporal e experiência presente</p>
+                    <p>Foco no aqui-agora, consciência corporal, experiência presente e totalidade</p>
+                </div>
+                <div class="approach-card" onclick="selectLine('tcc')">
+                    <div class="icon">📊</div>
+                    <h3>TCC</h3>
+                    <p>Terapia Cognitivo-Comportamental: pensamentos, emoções e comportamentos</p>
                 </div>
             </div>
             <div class="disclaimer">
-                ⚠️ Este assistente é um complemento ao tratamento profissional, não um substituto.
-                Em caso de crise, ligue CVV: 188
+                ⚠️ Este assistente é um complemento ao tratamento profissional, não um substituto. Em caso de crise, ligue CVV: 188
             </div>
         </div>
-        <div id="chat-screen">
-            <button class="back-btn" onclick="goBack()">← Voltar</button>
+
+        <!-- TELA 2: Escolher Terapeuta -->
+        <div id="screen-therapists" class="screen">
+            <button class="back-btn" onclick="backToLines()">← Voltar</button>
+            <div class="section-title">
+                <span class="line-badge" id="line-badge">Linha</span>
+                <h2>Escolha seu Terapeuta</h2>
+                <p>Cada um com estilo e abordagem únicos</p>
+            </div>
+            <div class="therapists" id="therapists-grid"></div>
+        </div>
+
+        <!-- TELA 3: Chat -->
+        <div id="screen-chat" class="screen">
+            <button class="back-btn" onclick="backToTherapists()">← Voltar</button>
             <div class="chat-header">
                 <div class="avatar-container" id="avatar">👤</div>
                 <div class="therapist-info">
                     <h2 id="therapist-name">Terapeuta</h2>
                     <p id="therapist-desc">Conectando...</p>
                     <p class="quote" id="therapist-quote"></p>
+                    <p class="style-badge" id="therapist-style"></p>
                 </div>
             </div>
             <div class="chat-messages" id="messages"></div>
@@ -112,48 +150,146 @@
             </div>
         </div>
     </div>
+
     <script>
         let ws = null;
-        let currentApproach = null;
-        const avatars = {
-            psicanalise: { icon: '🛋️', name: 'Dr. Sigmund', desc: 'Abordagem Psicanalítica', quote: '"O sonho é a estrada real para o inconsciente"', color: '#4a3728' },
-            behaviorismo: { icon: '📊', name: 'Dr. Aaron', desc: 'Terapia Cognitivo-Comportamental', quote: '"Nossos pensamentos moldam nossa realidade"', color: '#2d4a5e' },
-            gestalt: { icon: '🔮', name: 'Dr. Fritz', desc: 'Abordagem Gestalt', quote: '"Perca a cabeça e caia em si"', color: '#3d5a3d' }
+        let currentLine = null;
+        let currentTherapist = null;
+
+        const therapistsData = {
+            psicanalise: [
+                { 
+                    id: 'freud', name: 'Sigmund Freud', years: '1856-1939', avatar: '🧔', 
+                    specialty: 'Pai da Psicanálise',
+                    style: 'Exploração do inconsciente, sonhos, livre associação, transferência',
+                    quote: '"O sonho é a estrada real para o inconsciente"',
+                    color: '#8B4513'
+                },
+                { 
+                    id: 'lacan', name: 'Jacques Lacan', years: '1901-1981', avatar: '👤',
+                    specialty: 'Psicanálise Estrutural',
+                    style: 'Linguagem, significantes, desejo do Outro, Real-Simbólico-Imaginário',
+                    quote: '"O inconsciente é estruturado como linguagem"',
+                    color: '#4169E1'
+                },
+                { 
+                    id: 'jung', name: 'Carl Jung', years: '1875-1961', avatar: '🌙',
+                    specialty: 'Psicologia Analítica',
+                    style: 'Arquétipos, inconsciente coletivo, sombra, individuação, sonhos simbólicos',
+                    quote: '"Quem olha para fora sonha, quem olha para dentro desperta"',
+                    color: '#9932CC'
+                }
+            ],
+            gestalt: [
+                { 
+                    id: 'fritz', name: 'Fritz Perls', years: '1893-1970', avatar: '🔮',
+                    specialty: 'Fundador da Gestalt',
+                    style: 'Direto, confrontador, aqui-agora, awareness corporal, experimentos',
+                    quote: '"Perca a cabeça e caia em si"',
+                    color: '#228B22'
+                },
+                { 
+                    id: 'laura', name: 'Laura Perls', years: '1905-1990', avatar: '💫',
+                    specialty: 'Gestalt Relacional',
+                    style: 'Acolhedora, suporte, contato, presença, respiração, grounding',
+                    quote: '"O contato é a realização da diferença"',
+                    color: '#3CB371'
+                },
+                { 
+                    id: 'zinker', name: 'Joseph Zinker', years: '1934-2017', avatar: '🎨',
+                    specialty: 'Gestalt Criativa',
+                    style: 'Artístico, metáforas, experimentos criativos, imaginação, poesia',
+                    quote: '"A terapia é uma obra de arte em criação"',
+                    color: '#2E8B57'
+                }
+            ],
+            tcc: [
+                { 
+                    id: 'beck', name: 'Aaron Beck', years: '1921-2021', avatar: '📊',
+                    specialty: 'Pai da Terapia Cognitiva',
+                    style: 'Colaborativo, pensamentos automáticos, evidências, questionamento socrático',
+                    quote: '"Nossos pensamentos moldam nossa realidade"',
+                    color: '#4682B4'
+                },
+                { 
+                    id: 'ellis', name: 'Albert Ellis', years: '1913-2007', avatar: '⚡',
+                    specialty: 'TREC - Terapia Racional Emotiva',
+                    style: 'Direto, confrontador, modelo ABC, disputa de crenças irracionais',
+                    quote: '"Não são os eventos que nos perturbam, mas nossa visão sobre eles"',
+                    color: '#B22222'
+                },
+                { 
+                    id: 'judith', name: 'Judith Beck', years: '1954-', avatar: '📚',
+                    specialty: 'TCC Contemporânea',
+                    style: 'Estruturada, didática, tarefas práticas, cartões de enfrentamento',
+                    quote: '"A mudança cognitiva facilita a mudança comportamental"',
+                    color: '#5F9EA0'
+                }
+            ]
         };
-        function selectApproach(approach) {
-            currentApproach = approach;
-            document.getElementById('selection-screen').style.display = 'none';
-            document.getElementById('chat-screen').style.display = 'block';
-            updateAvatar(approach);
-            connectWebSocket(approach);
+
+        function selectLine(line) {
+            currentLine = line;
+            showScreen('screen-therapists');
+            renderTherapists(line);
+            
+            const badge = document.getElementById('line-badge');
+            badge.className = 'line-badge ' + line;
+            badge.textContent = line === 'psicanalise' ? '🛋️ Psicanálise' : 
+                               line === 'gestalt' ? '🔮 Gestalt' : '📊 TCC';
         }
-        function goBack() {
-            if (ws) ws.close();
-            document.getElementById('selection-screen').style.display = 'block';
-            document.getElementById('chat-screen').style.display = 'none';
-            document.getElementById('messages').innerHTML = '';
+
+        function renderTherapists(line) {
+            const grid = document.getElementById('therapists-grid');
+            const therapists = therapistsData[line];
+            
+            grid.innerHTML = therapists.map(t => `
+                <div class="therapist-card" onclick="selectTherapist('${t.id}')" style="--hover-color: ${t.color}">
+                    <div class="avatar">${t.avatar}</div>
+                    <h3>${t.name}</h3>
+                    <div class="years">${t.years}</div>
+                    <div class="specialty">${t.specialty}</div>
+                    <div class="style">📋 ${t.style}</div>
+                    <div class="quote">${t.quote}</div>
+                </div>
+            `).join('');
         }
-        function connectWebSocket(approach) {
+
+        function selectTherapist(therapistId) {
+            const therapists = therapistsData[currentLine];
+            currentTherapist = therapists.find(t => t.id === therapistId);
+            
+            showScreen('screen-chat');
+            updateTherapistUI();
+            connectWebSocket();
+        }
+
+        function updateTherapistUI() {
+            document.getElementById('avatar').textContent = currentTherapist.avatar;
+            document.getElementById('therapist-name').textContent = currentTherapist.name;
+            document.getElementById('therapist-desc').textContent = currentTherapist.specialty;
+            document.getElementById('therapist-quote').textContent = currentTherapist.quote;
+            document.getElementById('therapist-style').textContent = '📋 ' + currentTherapist.style;
+        }
+
+        function connectWebSocket() {
             updateStatus('Conectando...', '');
+            const approach = currentLine + '_' + currentTherapist.id;
             ws = new WebSocket(`ws://localhost:8000/ws/voice/${approach}`);
+            
             ws.onopen = () => updateStatus('Conectado', 'connected');
             ws.onmessage = (event) => handleResponse(JSON.parse(event.data));
             ws.onerror = () => updateStatus('Erro na conexão', 'error');
             ws.onclose = () => updateStatus('Desconectado', 'error');
         }
+
         function handleResponse(data) {
             if (data.type === 'response') {
                 addMessage(data.text, 'therapist');
                 if (data.crisis_info) showCrisisAlert();
             }
         }
-        function updateAvatar(approach) {
-            const av = avatars[approach];
-            document.getElementById('avatar').textContent = av.icon;
-            document.getElementById('therapist-name').textContent = av.name;
-            document.getElementById('therapist-desc').textContent = av.desc;
-            document.getElementById('therapist-quote').textContent = av.quote;
-        }
+
         function addMessage(text, type) {
             const messagesDiv = document.getElementById('messages');
             const msgDiv = document.createElement('div');
@@ -162,6 +298,7 @@
             messagesDiv.appendChild(msgDiv);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
+
         function sendMessage() {
             const input = document.getElementById('user-input');
             const text = input.value.trim();
@@ -170,12 +307,32 @@
             ws.send(JSON.stringify({ command: 'text_message', text: text }));
             input.value = '';
         }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function backToLines() {
+            if (ws) ws.close();
+            currentLine = null;
+            showScreen('screen-lines');
+        }
+
+        function backToTherapists() {
+            if (ws) ws.close();
+            document.getElementById('messages').innerHTML = '';
+            currentTherapist = null;
+            showScreen('screen-therapists');
+        }
+
         function showCrisisAlert() {
             const alertDiv = document.createElement('div');
             alertDiv.className = 'crisis-alert';
             alertDiv.innerHTML = '<p>Se você está em crise, ligue agora:</p><a href="tel:188">📞 CVV: 188</a>';
             document.getElementById('messages').appendChild(alertDiv);
         }
+
         function updateStatus(text, className) {
             const status = document.getElementById('status');
             status.textContent = text;

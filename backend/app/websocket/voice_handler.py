@@ -1,11 +1,12 @@
 """
-PSICOVOZ - Voice Handler (modo texto)
+PSICOAPOIO - Voice Handler (modo texto)
+Suporta 9 terapeutas diferentes
 """
 import json
-import base64
 from enum import Enum
 from loguru import logger
 from fastapi import WebSocket
+from prompts import get_prompt, get_therapist_info
 
 
 class SessionState(Enum):
@@ -23,9 +24,10 @@ class VoiceHandler:
         self.llm = llm_service
         self.state = SessionState.ACTIVE
         self.conversation_history = []
+        self.therapist_info = get_therapist_info(approach)
     
     async def run(self):
-        logger.info(f"🎬 Sessão iniciada - Abordagem: {self.approach}")
+        logger.info(f"🎬 Sessão iniciada - {self.therapist_info['name']} ({self.approach})")
         await self._send_welcome()
         
         while self.state != SessionState.ENDED:
@@ -44,9 +46,8 @@ class VoiceHandler:
         logger.info("🔚 Sessão encerrada")
     
     async def _send_welcome(self):
-        names = {"psicanalise": "Dr. Sigmund", "behaviorismo": "Dr. Aaron", "gestalt": "Dr. Fritz"}
-        name = names.get(self.approach, "Terapeuta")
-        welcome = f"Olá! Eu sou {name}, seu assistente terapêutico. Estou aqui para te ouvir e apoiar. Como você está se sentindo hoje?"
+        info = self.therapist_info
+        welcome = f"Olá! Eu sou {info['name']}, {info['title']}. Estou aqui para te ouvir e apoiar. Como você está se sentindo hoje?"
         
         await self._send_response(welcome)
         self.conversation_history.append({"role": "assistant", "content": welcome})
